@@ -21,6 +21,7 @@ export default function Home() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [saveStep, setSaveStep] = useState<'initial' | 'email' | 'success'>('initial');
   const [email, setEmail] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,7 +207,22 @@ export default function Home() {
 
                 {saveStep === 'email' && (
                   <form
-                    onSubmit={(e) => { e.preventDefault(); setSaveStep('success'); }}
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setSaving(true);
+                      try {
+                        await fetch('/api/save-interest', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email, recipeTitle: recipe.title }),
+                        });
+                      } catch (err) {
+                        console.error('Failed to notify:', err);
+                      } finally {
+                        setSaving(false);
+                        setSaveStep('success');
+                      }
+                    }}
                     className="max-w-md mx-auto animate-in fade-in zoom-in duration-300"
                   >
                     <p className="text-[var(--primary)] font-bold mb-4 uppercase tracking-wider text-xs">Join the Waitlist</p>
@@ -214,16 +230,18 @@ export default function Home() {
                       <input
                         type="email"
                         required
+                        disabled={saving}
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:outline-none px-4 py-2 text-sm"
+                        className="flex-1 bg-transparent border-none focus:outline-none px-4 py-2 text-sm disabled:opacity-50"
                       />
                       <button
                         type="submit"
-                        className="px-6 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-bold hover:bg-[var(--primary-hover)] transition-colors"
+                        disabled={saving}
+                        className="px-6 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-bold hover:bg-[var(--primary-hover)] transition-colors disabled:opacity-70"
                       >
-                        Submit
+                        {saving ? 'Sending...' : 'Submit'}
                       </button>
                     </div>
                   </form>
