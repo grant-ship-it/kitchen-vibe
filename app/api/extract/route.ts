@@ -37,13 +37,15 @@ export async function POST(request: Request) {
                 puppeteerCore = (await import('puppeteer-core')).default;
             }
 
+            console.log('Starting puppeteer-core launch...');
             browser = await puppeteerCore.launch({
-                args: chromium.args,
+                args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
                 defaultViewport: chromium.defaultViewport,
                 executablePath: await chromium.executablePath(),
                 headless: chromium.headless,
                 ignoreHTTPSErrors: true,
             });
+            console.log('Browser launched successfully');
 
         } else {
             // Local: Use standard puppeteer (full Chrome)
@@ -132,7 +134,7 @@ export async function POST(request: Request) {
 
     } catch (error: any) {
         console.error('Extraction error:', error);
-        return NextResponse.json({ error: 'Failed to fetch the URL', details: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch the URL', details: error.message, stack: error.stack }, { status: 500 });
     } finally {
         if (browser) {
             await browser.close();
