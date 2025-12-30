@@ -38,6 +38,10 @@ export async function POST(request: Request) {
             }
 
             console.log('Starting puppeteer-core launch...');
+
+            // Set font config path to help chromium find its files
+            await chromium.font('/tmp/chromium-fonts');
+
             browser = await puppeteerCore.launch({
                 args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
                 defaultViewport: chromium.defaultViewport,
