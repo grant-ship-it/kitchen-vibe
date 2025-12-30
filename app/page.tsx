@@ -19,6 +19,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [saveStep, setSaveStep] = useState<'initial' | 'email' | 'success'>('initial');
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +29,8 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setRecipe(null);
+    setSaveStep('initial');
+    setEmail('');
 
     try {
       const res = await fetch('/api/extract', {
@@ -186,6 +190,51 @@ export default function Home() {
                     })}
                   </div>
                 </div>
+              </div>
+
+              {/* Save Recipe Feature (Teaser) */}
+              <div className="mt-12 pt-8 border-t border-[var(--border)] text-center">
+                {saveStep === 'initial' && (
+                  <button
+                    onClick={() => setSaveStep('email')}
+                    className="px-8 py-3 rounded-full bg-[var(--foreground)] text-white font-semibold hover:opacity-90 transition-all transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-2 mx-auto"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></svg>
+                    Save Recipe
+                  </button>
+                )}
+
+                {saveStep === 'email' && (
+                  <form
+                    onSubmit={(e) => { e.preventDefault(); setSaveStep('success'); }}
+                    className="max-w-md mx-auto animate-in fade-in zoom-in duration-300"
+                  >
+                    <p className="text-[var(--primary)] font-bold mb-4 uppercase tracking-wider text-xs">Join the Waitlist</p>
+                    <div className="flex gap-2 p-1 rounded-full border border-[var(--border)] bg-[var(--accent)] shadow-inner">
+                      <input
+                        type="email"
+                        required
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="flex-1 bg-transparent border-none focus:outline-none px-4 py-2 text-sm"
+                      />
+                      <button
+                        type="submit"
+                        className="px-6 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-bold hover:bg-[var(--primary-hover)] transition-colors"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {saveStep === 'success' && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <p className="text-xl font-bold text-[var(--primary)] mb-1">Coming soon!</p>
+                    <p className="text-gray-500 text-sm">We&apos;ll notify <strong>{email}</strong> when the Kitchen Vault is ready.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
