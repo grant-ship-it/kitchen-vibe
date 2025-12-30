@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         const html = await page.content();
 
         const $ = cheerio.load(html);
-        let recipeData = null;
+        let recipeData: any = null;
 
         // 1. Try to find JSON-LD Schema
         $('script[type="application/ld+json"]').each((_, element) => {
