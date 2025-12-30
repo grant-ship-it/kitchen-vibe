@@ -31,21 +31,23 @@ export async function POST(request: Request) {
         if (isProduction) {
             // Vercel / Production: Use puppeteer-core + @sparticuz/chromium
             if (!chromium) {
-                chromium = (await import('@sparticuz/chromium')).default;
+                chromium = (await import('@sparticuz/chromium-min')).default;
             }
             if (!puppeteerCore) {
                 puppeteerCore = (await import('puppeteer-core')).default;
             }
 
-            console.log('Starting puppeteer-core launch...');
+            console.log('Starting puppeteer-core launch with chromium-min...');
 
-            const exePath = await chromium.executablePath();
-            console.log('Chromium executable path:', exePath);
+            const remoteExecutablePath = await chromium.executablePath(
+                'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+            );
+            console.log('Chromium executable path (remote):', remoteExecutablePath);
 
             browser = await puppeteerCore.launch({
                 args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
                 defaultViewport: chromium.defaultViewport,
-                executablePath: exePath,
+                executablePath: remoteExecutablePath,
                 headless: chromium.headless,
                 ignoreHTTPSErrors: true,
             });
