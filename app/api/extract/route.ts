@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 
         // Speed optimization: Block images, css, and fonts
         await page.setRequestInterception(true);
-        page.on('request', (req) => {
+        page.on('request', (req: any) => {
             const resourceType = req.resourceType();
             if (['image', 'stylesheet', 'font', 'media', 'other'].includes(resourceType)) {
                 req.abort();
