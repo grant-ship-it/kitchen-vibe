@@ -45,7 +45,14 @@ export async function POST(request: Request) {
             console.log('Chromium executable path (remote):', remoteExecutablePath);
 
             browser = await puppeteerCore.launch({
-                args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+                args: [
+                    ...chromium.args,
+                    '--hide-scrollbars',
+                    '--disable-web-security',
+                    '--single-process',
+                    '--no-zygote',
+                    '--no-sandbox'
+                ],
                 defaultViewport: chromium.defaultViewport,
                 executablePath: remoteExecutablePath,
                 headless: chromium.headless,
@@ -67,13 +74,24 @@ export async function POST(request: Request) {
 
         const page = await browser.newPage();
 
+        // Speed optimization: Block images, css, and fonts
+        await page.setRequestInterception(true);
+        page.on('request', (req) => {
+            const resourceType = req.resourceType();
+            if (['image', 'stylesheet', 'font', 'media', 'other'].includes(resourceType)) {
+                req.abort();
+            } else {
+                req.continue();
+            }
+        });
+
         // Set a consistent viewport and user agent
         await page.setViewport({ width: 1366, height: 768 });
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
         // Go to URL
-        // Increase timeout for serverless cold starts or slow sites
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        // We only care about the JSON-LD, so domcontentloaded is enough and faster
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
 
         // Get the HTML content
         const html = await page.content();
