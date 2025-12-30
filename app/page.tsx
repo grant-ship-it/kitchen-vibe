@@ -197,7 +197,7 @@ export default function Home() {
                 {saveStep === 'initial' && (
                   <button
                     onClick={() => setSaveStep('email')}
-                    className="px-8 py-3 rounded-full bg-[var(--foreground)] text-white font-semibold hover:opacity-90 transition-all transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-2 mx-auto"
+                    className="px-8 py-3 rounded-full bg-[var(--primary)] text-white font-semibold hover:opacity-90 transition-all transform hover:scale-105 active:scale-95 shadow-md flex items-center gap-2 mx-auto"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></svg>
                     Save Recipe
